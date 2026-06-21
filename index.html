@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>رسالةُ لا تصل</title>
+<title>رسالةٌ لا تصل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -69,6 +69,29 @@
     direction:ltr;opacity:0;animation:fade 2s ease forwards 2.2s;
   }
   .hero .scrolltip::after{content:"";display:block;width:1px;height:34px;background:linear-gradient(var(--muted-faint),transparent);margin:14px auto 0;animation:pulse 2.4s ease-in-out infinite}
+
+  /* ---------- found-ledger preface ---------- */
+  .preface{padding:8vh 0 2vh;max-width:600px;margin:0 auto}
+  .preface .frame{
+    font-family:"Amiri",serif;font-style:italic;
+    color:var(--parchment-dim);font-size:1.16rem;line-height:2;
+    border:1px solid var(--rule);border-radius:10px;
+    padding:1.6rem 1.8rem;background:rgba(255,255,255,0.015);
+    position:relative;
+  }
+  .preface .frame::before{
+    content:"";position:absolute;inset:5px;border:1px solid var(--rule-soft);
+    border-radius:7px;pointer-events:none;
+  }
+  .preface .body{color:var(--parchment);margin-top:1.8rem;line-height:2.05}
+  .preface .handoff{
+    font-family:"Amiri",serif;color:var(--amber);font-size:1.18rem;
+    text-align:center;margin-top:1.8rem;font-style:italic;
+  }
+  @media (min-width:1200px){
+    .preface{max-width:680px}
+    .preface .frame{font-size:1.32rem}
+  }
 
   /* ---------- Sections ---------- */
   .chapter{padding:7vh 0;border-top:1px solid var(--rule-soft)}
@@ -191,6 +214,105 @@
   footer .end{font-family:"Amiri",serif;font-style:italic;color:var(--muted);font-size:1.1rem;margin-bottom:2rem}
   footer .meta{font-family:"IBM Plex Mono",monospace;font-size:0.66rem;letter-spacing:0.18em;color:var(--muted-faint);direction:ltr;line-height:2}
 
+  /* ---------- inline door: small card glyph at end of paragraph ---------- */
+  .door-q{display:block;margin:0}
+  .door-q > p{margin-bottom:1.5rem}
+  /* the card button sits inline right after the paragraph text */
+  .di-cardbtn{
+    display:inline-flex;align-items:center;justify-content:center;vertical-align:-0.35em;
+    background:none;border:none;padding:0;margin-inline-start:0.5rem;cursor:pointer;
+    width:1.5em;height:1.5em;border-radius:3px;transition:transform .3s;
+  }
+  .di-cardbtn svg{width:100%;height:100%;display:block}
+  .di-cardbtn .card-rect{fill:var(--amber);stroke:var(--amber);stroke-width:1.4;transition:stroke .3s,fill .3s}
+  .di-cardbtn .card-line{stroke:var(--ink-deep);stroke-width:1.2;opacity:0.85;transition:stroke .3s}
+  .di-cardbtn:hover{transform:translateY(-1px)}
+  .di-cardbtn:hover .card-rect{stroke:#f0bf5e;fill:#f0bf5e}
+  .di-cardbtn:hover .card-line{stroke:var(--ink-deep)}
+  .di-cardbtn:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  .door-q[aria-expanded="true"] .di-cardbtn .card-rect{fill:var(--sage);stroke:var(--sage)}
+  .door-q[aria-expanded="true"] .di-cardbtn .card-line{stroke:var(--ink-deep);opacity:0.9}
+
+  /* expanded brief: block-level, appears under the paragraph */
+  .door-q .di-brief{
+    display:block;overflow:hidden;max-height:0;opacity:0;
+    transition:max-height .5s cubic-bezier(.2,.7,.2,1),opacity .45s,margin .45s;margin-top:0;
+  }
+  .door-q[aria-expanded="true"] .di-brief{max-height:240px;opacity:1;margin-top:1.1rem;margin-bottom:0.5rem}
+  .door-q .di-brief-inner{
+    border-right:2px solid var(--amber-soft);padding:0.1rem 1.1rem;
+    font-family:"Amiri",serif;font-style:italic;color:var(--parchment-dim);
+    font-size:1.04rem;line-height:1.75;
+  }
+  .door-q .di-open{
+    display:inline-block;margin-top:0.7rem;font-style:normal;
+    font-family:"Noto Naskh Arabic";font-size:0.92rem;color:var(--amber);
+    background:none;border:none;cursor:pointer;padding:0;
+    border-bottom:1px solid transparent;transition:border-color .3s;
+  }
+  .door-q .di-open:hover{border-bottom-color:var(--amber)}
+  .door-q .di-open:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+
+  /* ---------- side doors (hidden stories) ---------- */
+  .doors{padding:6vh 0 2vh;border-top:1px solid var(--rule-soft)}
+  .doors-lead{text-align:center;color:var(--muted);font-size:1rem;line-height:1.9;margin-bottom:2.4rem;max-width:44ch;margin-inline:auto}
+  .door-grid{display:flex;gap:1.2rem;flex-wrap:wrap;justify-content:center}
+  .door{
+    flex:1 1 280px;max-width:340px;text-align:right;
+    background:linear-gradient(180deg,var(--ink-raised),var(--ink));
+    border:1px solid var(--rule);border-radius:12px;padding:1.6rem 1.5rem;
+    cursor:pointer;transition:all .4s cubic-bezier(.2,.7,.2,1);
+    color:inherit;font:inherit;display:block;
+  }
+  .door:hover{border-color:var(--amber-soft);transform:translateY(-3px);box-shadow:0 24px 60px -36px rgba(0,0,0,0.9)}
+  .door:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  .door .door-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:0.6rem;letter-spacing:0.26em;color:var(--amber-soft);direction:ltr;text-transform:uppercase;margin-bottom:0.7rem}
+  .door .door-title{font-family:"Amiri",serif;font-size:1.4rem;color:var(--parchment);margin-bottom:0.5rem;line-height:1.4}
+  .door .door-desc{color:var(--muted);font-size:0.96rem;line-height:1.7}
+  .door .door-open{margin-top:1rem;font-size:0.84rem;color:var(--amber);font-family:"Noto Naskh Arabic"}
+
+  /* overlay */
+  .overlay{
+    position:fixed;inset:0;z-index:50;background:rgba(8,9,13,0.97);
+    backdrop-filter:blur(6px);overflow-y:auto;
+    opacity:0;visibility:hidden;transition:opacity .5s;
+  }
+  .overlay.open{opacity:1;visibility:visible}
+  .overlay-inner{max-width:680px;margin:0 auto;padding:9vh 28px 12vh;position:relative}
+  .overlay-close{
+    position:fixed;top:20px;right:20px;z-index:60;
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(23,26,35,0.9);border:1px solid var(--rule);
+    color:var(--parchment-dim);font-size:1.3rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all .3s;
+  }
+  .overlay-close:hover{border-color:var(--amber-soft);color:var(--amber);transform:rotate(90deg)}
+  .overlay-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:0.64rem;letter-spacing:0.26em;color:var(--amber-soft);direction:ltr;text-transform:uppercase;text-align:center;margin-bottom:0.8rem}
+  .overlay h2{font-family:"Amiri",serif;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--parchment);text-align:center;margin-bottom:0.8rem;line-height:1.4}
+  .overlay .lead{font-family:"Amiri",serif;font-style:italic;color:var(--amber);text-align:center;font-size:1.18rem;line-height:1.8;margin-bottom:3rem;max-width:40ch;margin-inline:auto}
+
+  /* dual-account two-column layout for story 7 */
+  .accounts{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin-bottom:2rem}
+  .account{padding:1.6rem 1.4rem}
+  .account:first-child{border-left:1px solid var(--rule)}
+  .account h3{font-family:"Amiri",serif;font-size:1.2rem;margin-bottom:1rem;text-align:center}
+  .account.east h3{color:var(--sage)}
+  .account.west h3{color:var(--crimson)}
+  .account p{font-size:1.04rem;line-height:1.95;margin-bottom:1rem;color:var(--parchment-dim)}
+  .account .signed{font-family:"Amiri",serif;font-style:italic;color:var(--muted);font-size:0.94rem;margin-top:1.4rem;text-align:left;direction:rtl}
+  .accounts-verdict{font-family:"Amiri",serif;font-style:italic;color:var(--parchment);text-align:center;font-size:1.16rem;line-height:1.9;padding:0 1rem}
+  @media (max-width:560px){
+    .accounts{grid-template-columns:1fr}
+    .account:first-child{border-left:none;border-bottom:1px solid var(--rule)}
+  }
+
+  /* letters layout for story 9 */
+  .letter{border-right:2px solid var(--rule);padding:0.2rem 1.4rem;margin-bottom:2.2rem}
+  .letter .head{font-family:"IBM Plex Mono",monospace;font-size:0.7rem;letter-spacing:0.12em;color:var(--amber-soft);direction:rtl;margin-bottom:0.8rem}
+  .letter p{color:var(--parchment-dim);line-height:2;margin-bottom:0.8rem}
+  .letter.last{border-right-color:var(--crimson-deep)}
+  .letter.last p{color:var(--muted)}
+
   /* ---------- ambient audio control (Tier 4 hook) ---------- */
   .audio-toggle{
     position:fixed;top:18px;left:18px;z-index:20;
@@ -253,13 +375,20 @@
 <header class="hero">
   <div class="wrap">
     <div class="eyebrow">a parable of distributed trust</div>
-    <h1>رسالةُ<br>لا تصل</h1>
+    <h1>رسالةٌ<br>لا تصل</h1>
     <p class="sub">حكايةُ حارسٍ شاكٍّ، ومجلسٍ على نهر،<br>وكلِّ يقينٍ يصلُ بعد أوانه.</p>
   </div>
   <div class="scrolltip">انزل</div>
 </header>
 
 <main class="wrap">
+
+  <!-- found-ledger preface -->
+  <section class="preface">
+    <div class="frame reveal">وُجِدَ هذا الدفترُ في برجِ الحراسةِ الشرقي، بعد أن خلا المكانُ بزمنٍ طويل. لا تاريخَ على صفحاته — يبدو أنَّ صاحبَه كان يرتابُ في التواريخِ أيضاً. نَقَلْناه كما هو، بخطِّه، دون أن نُصلِحَ شكَّه أو نُكمِلَ ما تركَه ناقصاً. وهذا أوّلُ ما كُتِب.</div>
+    <p class="body reveal">كان حارساً، ثمَّ صار كاتباً. وبين الأمرين طريقٌ طويل، وحربٌ، وصديقٌ على بوّابة. لم يكتبْ لِيُقرَأ، على ما يبدو؛ كتبَ لأنَّ الكتابةَ هي الشيءُ الوحيدُ الذي يبقى ثابتاً حين لا يثبتُ شيءٌ آخر — لا الرسائلُ، ولا الرجالُ، ولا اليقينُ نفسُه.</p>
+    <p class="handoff reveal">نتركُه الآن يتكلّم.</p>
+  </section>
 
   <!-- 1 -->
   <section class="chapter">
@@ -285,10 +414,13 @@
     <p class="reveal">علَّمني الطريقُ ما لا ينتهي الفلاسفةُ من الجدالِ حولَه: لا تستطيعُ أن تعرفَ أنَّ الرسالةَ وصلت، بل تستطيعُ فقط أن تتصرَّفَ كما لو أنَّ رجلاً أخذَ منكَ أجرَكَ سيؤدّي عملَه، ويعودُ راكضاً قبل أن يموتَ الضوء.</p>
     <p class="reveal" style="font-family:'Amiri',serif;font-style:italic;color:var(--amber)">اليقينُ ليس أجرَ الرسول؛ التسليمُ هو أجرُه.</p>
     <p class="reveal">أتذكَّرُ شيخاً سبقني على هذا الطريق. سألتُه مرّةً، وأنا ما زلتُ غِرّاً، كيف ينامُ وهو لا يدري أوصلتْ رسائلُه أم ضاعت. ضحكَ ضحكةً لم أفهمها إلّا بعد عشرين سنة، ثمَّ قال:</p>
-    <div class="speech reveal">«يا بُنيَّ، الفجوةُ بين أن تُرسِلَ وأن يُستَلَمَ لا تُسَدُّ أبداً. لكنَّ الجسورَ لا تُبنى لتَسُدَّ الهاوية، بل تُبنى لتعبُرَها ».</div>
+    <div class="speech reveal">«يا بُنيَّ، الفجوةُ بين أن تُرسِلَ وأن يُستَلَمَ لا تُسَدُّ أبداً. لكنَّ الجسورَ لا تُبنى لتَسُدَّ الهاوية، بل تُبنى لتعبُرَها».</div>
     <p class="reveal dim">ثمَّ أضافَ، وهو ينظرُ إلى الأفق:</p>
     <div class="speech reveal">«احذرِ اليومَ الذي يكونُ فيه العدوُّ ليس الطريقَ، بل الرجلَ في آخِرِه».</div>
-    <p class="reveal">لم أفهم. فهمتُ الآن.</p>
+    <div class="door-q reveal" aria-expanded="false">
+      <p>لم أفهم. فهمتُ الآن.<button class="di-cardbtn" data-toggle aria-label="صفحةٌ أُخرى من الدفتر — اضغط للكشف"><svg viewBox="0 0 20 26" xmlns="http://www.w3.org/2000/svg"><rect class="card-rect" x="1.5" y="1.5" width="17" height="23" rx="2.5"/><line class="card-line" x1="5" y1="7" x2="15" y2="7"/><line class="card-line" x1="5" y1="11" x2="12" y2="11"/><line class="card-line" x1="5" y1="15" x2="14" y2="15"/></svg></button></p>
+      <div class="di-brief"><div class="di-brief-inner">رسائلُ أُرسِلت من هذا البرجِ إلى البوّابةِ الشرقية، ولم يَعُدْ منها جواب.<br><button class="di-open" data-door="letters">افتحِ الصفحة ←</button></div></div>
+    </div>
   </section>
 
   <!-- 3 -->
@@ -300,7 +432,10 @@
     <p class="reveal">القاعدةُ قديمةٌ وبسيطة: حين يتَّفقُ أكثرُ من النصف، يُقضى الأمر. مئةَ عامٍ صمدتِ القاعدة، لأنَّ الصامتين كانوا غائبين فحسب — ذهبوا إلى القبر، أو إلى النوم، أو إلى الصمت. والصوتُ الغائبُ صوتٌ صادق؛ لا يكذبُ على أحد. الكرسيُّ الفارغُ لا يخدعُك، هو فقط لا يُجيب.</p>
     <p class="reveal">كنتُ قد تركتُ الطريقَ منذ زمن، وصرتُ كاتبَ المجلس، أُدوِّنُ الأصواتَ كما دوَّنتُ يوماً ساعاتِ التسليم. ظننتُ أنّي تركتُ الشكَّ على الطريق؛ لكنَّ الشكَّ تبِعني إلى الغرفة.</p>
     <p class="reveal">لأنَّ هذا الموسمَ كان مختلفاً.</p>
-    <p class="reveal">هذا الموسمَ تكلَّمَ بعضُ التسعة، وما تكلَّموا به كان سُمّاً في ثوبِ نُصح. والأسوأُ أنَّهم لم يتَّفقوا حتى فيما بينهم على الكذبةِ الواحدة: للأعضاءِ الشرقيين حلفوا شيئاً، وللغربيين نقيضَه. رأيتُ ذلك بعينيَّ، لأنّي الكاتب، وأنا الوحيدُ الذي يسمعُ الغُرفتين.</p>
+    <div class="door-q reveal" aria-expanded="false">
+      <p>هذا الموسمَ تكلَّمَ بعضُ التسعة، وما تكلَّموا به كان سُمّاً في ثوبِ نُصح. والأسوأُ أنَّهم لم يتَّفقوا حتى فيما بينهم على الكذبةِ الواحدة: للأعضاءِ الشرقيين حلفوا شيئاً، وللغربيين نقيضَه. رأيتُ ذلك بعينيَّ، لأنّي الكاتب، وأنا الوحيدُ الذي يسمعُ الغُرفتين.<button class="di-cardbtn" data-toggle aria-label="صفحةٌ أُخرى من الدفتر — اضغط للكشف"><svg viewBox="0 0 20 26" xmlns="http://www.w3.org/2000/svg"><rect class="card-rect" x="1.5" y="1.5" width="17" height="23" rx="2.5"/><line class="card-line" x1="5" y1="7" x2="15" y2="7"/><line class="card-line" x1="5" y1="11" x2="12" y2="11"/><line class="card-line" x1="5" y1="15" x2="14" y2="15"/></svg></button></p>
+      <div class="di-brief"><div class="di-brief-inner">ليلةٌ وصلَتْ فيها شهادتان موقّعتان عن البوّابةِ نفسِها، تكذّبُ إحداهما الأخرى.<br><button class="di-open" data-door="accounts">افتحِ الصفحة ←</button></div></div>
+    </div>
     <p class="reveal">وهنا تغيَّرَ السؤالُ كلُّه في رأسي. طَوالَ حياتي كان سؤالي: أحيٌّ هو؟ أوصلتِ الرسالة؟ أما زالَ في البوّابة؟ أمّا الآن، فصار: هل أُصدِّقُه أصلاً؟</p>
     <p class="reveal">شتّانَ بين السؤالين: الأوَّلُ يخصُّ غيابَ الإنسان، والثاني يخصُّ حضورَه الكاذب.</p>
   </section>
@@ -427,16 +562,143 @@
     </details>
   </section>
 
+  <!-- side doors to hidden stories -->
+  <section class="doors">
+    <div class="ch-num reveal" style="text-align:center">SIDE DOORS</div>
+    <h2 class="reveal" style="font-family:'Amiri',serif;text-align:center;font-size:clamp(1.6rem,4vw,2.1rem);color:var(--parchment);margin-bottom:1.2rem">صفحاتٌ أُخرى من الدفتر</h2>
+    <p class="doors-lead reveal">وُجِدت مع الدفترِ أوراقٌ متفرّقةٌ بخطوطٍ مختلفة. لم تكن جزءاً من القصة، لكنّها منها. افتحْ ما شئت.</p>
+    <div class="door-grid">
+      <button class="door reveal" data-door="accounts">
+        <div class="door-eyebrow">two accounts · one event</div>
+        <div class="door-title">روايتان لِليلةٍ واحدة</div>
+        <div class="door-desc">شهادتان عن البوّابةِ نفسِها، كلتاهما موقّعة، وكلتاهما تكذّبُ الأخرى. على الكاتبِ أن يختار.</div>
+        <div class="door-open">افتحِ الصفحة ←</div>
+      </button>
+      <button class="door reveal" data-door="letters">
+        <div class="door-eyebrow">letters into silence</div>
+        <div class="door-title">رسائلُ لا تُردّ</div>
+        <div class="door-desc">سبعُ رسائلَ أُرسِلت إلى البوّابةِ الشرقية. لم يصلْ جوابٌ عن أيٍّ منها قطّ.</div>
+        <div class="door-open">افتحِ الصفحة ←</div>
+      </button>
+    </div>
+  </section>
+
 </main>
+
+<!-- overlay: dual accounts (story 7) -->
+<div class="overlay" id="overlay-accounts" role="dialog" aria-modal="true" aria-label="روايتان لليلة واحدة">
+  <button class="overlay-close" data-close aria-label="إغلاق">✕</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">two accounts · one event</div>
+    <h2>روايتان لِليلةٍ واحدة</h2>
+    <p class="lead">وصلَتا في الليلةِ نفسِها، عن البوّابةِ نفسِها. قرأتُهما مرّتين. لا أزالُ لا أعرف.</p>
+
+    <div class="accounts">
+      <div class="account east">
+        <h3>الشهادةُ الشرقية</h3>
+        <p>مالكٌ حرسَ البوّابةَ حتى الفجر، ولم يبرحْ موضعَه. أرسلَ في الساعةِ الثالثةِ يقولُ إنَّ كلَّ شيءٍ على ما يُرام، وإنَّ الطريقَ آمنٌ لِمن أرادَ العبور. رأيتُ رسولَه بعينيّ، وأخذتُ منه الرسالةَ بيدي.</p>
+        <p>افتحوا البوّابةَ الغربيةَ إذَن، فالخطرُ قد زال.</p>
+        <p class="signed">— بخطِّ حارسِ البرجِ الشمالي، وعليه ختمُه.</p>
+      </div>
+      <div class="account west">
+        <h3>الشهادةُ الغربية</h3>
+        <p>مالكٌ تركَ البوّابةَ في الساعةِ الثانية، ولم يعدْ. الرسالةُ التي جاءت في الثالثةِ لم تكن منه؛ خطُّها ليس خطَّه، وإن حملت ختمَه. أُحذّرُكم: الطريقُ مفتوحٌ للعدوّ.</p>
+        <p>أغلِقوا البوّابةَ الغربيةَ فوراً، وإلّا دخلَ علينا الليلُ بمن فيه.</p>
+        <p class="signed">— بخطِّ حارسِ البرجِ الجنوبي، وعليه ختمُه.</p>
+      </div>
+    </div>
+
+    <p class="accounts-verdict">كلتاهما موقّعةٌ بختمٍ صحيح. كلتاهما من رجلٍ لم يكذبْ عليّ قطّ. وإحداهما تأمرُني أن أفتح، والأخرى أن أُغلِق — والمدينةُ تنامُ على ما سأكتبُه أنا، الآن، بيدٍ لا تدري أيَّ الرجلين تُصدّق.<br><br>أغمِسُ القلم. لا أعرفُ بعدُ ما ستكتبُه يدي.</p>
+  </div>
+</div>
+
+<!-- overlay: letters (story 9) -->
+<div class="overlay" id="overlay-letters" role="dialog" aria-modal="true" aria-label="رسائل لا تُردّ">
+  <button class="overlay-close" data-close aria-label="إغلاق">✕</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">letters into silence</div>
+    <h2>رسائلُ لا تُردّ</h2>
+    <p class="lead">إلى حارسِ البوّابةِ الشرقية، من البرج. كتبتُها كلَّها. لا أعرفُ إن وصلَ منها حرفٌ واحد.</p>
+
+    <div class="letter">
+      <div class="head">الإرسالُ الأوّل · ليلةُ المُحاق</div>
+      <p>لم يصلْني منكَ خبرٌ منذُ هلَّ القمرُ الجديد. أكتبُ كأنّك هناك، لأنّي لا أملكُ طريقةً أُخرى للكتابة. إن بلغتكَ هذه، فأنتَ تعرفُ أكثرَ ممّا أعرف — تعرفُ أنّها بلغتك. أمّا أنا فلن أنالَ هذه المعرفةَ أبداً.</p>
+      <p>أرسِلْ كلمة. لن أعلمَ أنّي سألت.</p>
+    </div>
+
+    <div class="letter">
+      <div class="head">الإرسالُ الثاني · بعد ثلاثِ ليالٍ</div>
+      <p>لا جواب. أقولُ لنفسي إنَّ الطريقَ طويل، وإنَّ الرسولَ قد يتأخّر، وإنَّ الصمتَ ليس بالضرورةِ خبراً سيّئاً. أقولُ لنفسي أشياءَ كثيرة.</p>
+      <p>هل وصلتكَ الأولى؟ لو كنتُ أدري، لكتبتُ غيرَ هذا. لكنّي لا أدري، فأُعيدُ ما قلت.</p>
+    </div>
+
+    <div class="letter">
+      <div class="head">الإرسالُ الرابع · لا أُحصي الليالي</div>
+      <p>كففتُ عن السؤالِ إن كنتَ تقرأ. صرتُ أكتبُ لأنَّ الكتابةَ تُبقيني، لا لأنّها تصلُك. ربّما أنتَ تقرأُ كلَّ حرف، وربّما لم تصلْ ورقةٌ واحدة، وربّما لم يعدْ هناكَ مَن يقرأ.</p>
+      <p>الاحتمالاتُ الثلاثةُ متساوية عندي الآن. هذا أصعبُ ما في الأمر: ليس أنّكَ صامت، بل أنّي لا أعرفُ نوعَ صمتك.</p>
+    </div>
+
+    <div class="letter last">
+      <div class="head">الإرسالُ الأخير · عند الفجر</div>
+      <p>لن أنتظرَ جواباً بعد اليوم. ليس يأساً — بل لأنّي فهمتُ أخيراً أنَّ الانتظارَ نفسَه كان خطئي. الرسولُ يُسلِّمُ ولا يقف. هذا كلُّ ما يملكُه الرسول.</p>
+      <p>أُسلّمُ هذه، وأمضي. إن وصلتْك، فاعلمْ أنّي لم أكفَّ عن الكتابةِ إليك. وإن لم تصلْ… فقد قلتُها على أيِّ حال، ويكفي أنّي قلتُها.</p>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
     <p class="end">تمّت.</p>
-    <p class="meta">الرسالةُ التي لا تصل · a parable of distributed trust<br>اقرأها كقصة، أو افتح الملحق لترى ما تحتها.</p>
+    <p class="meta">رسالةٌ لا تصل · a parable of distributed trust<br>اقرأها كقصة، أو افتح الملحق لترى ما تحتها.</p>
   </div>
 </footer>
 
 <script>
+/* ============ inline quiet-door expand/collapse ============ */
+(function(){
+  document.querySelectorAll(".door-q [data-toggle]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const wrap = btn.closest(".door-q");
+      const open = wrap.getAttribute("aria-expanded") === "true";
+      wrap.setAttribute("aria-expanded", open ? "false" : "true");
+    });
+  });
+})();
+
+/* ============ side-door overlays (hidden stories) ============ */
+(function(){
+  const doors = document.querySelectorAll("[data-door]");
+  const overlays = {
+    accounts: document.getElementById("overlay-accounts"),
+    letters: document.getElementById("overlay-letters")
+  };
+  let lastFocused = null;
+  function open(name){
+    const ov = overlays[name]; if(!ov) return;
+    lastFocused = document.activeElement;
+    ov.classList.add("open");
+    ov.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+    const c = ov.querySelector("[data-close]"); if(c) c.focus();
+  }
+  function close(ov){
+    ov.classList.remove("open");
+    document.body.style.overflow = "";
+    if(lastFocused) lastFocused.focus();
+  }
+  doors.forEach(d=>d.addEventListener("click",()=>open(d.dataset.door)));
+  Object.values(overlays).forEach(ov=>{
+    if(!ov) return;
+    ov.querySelector("[data-close]").addEventListener("click",()=>close(ov));
+    ov.addEventListener("click",(e)=>{ if(e.target===ov) close(ov); });
+  });
+  document.addEventListener("keydown",(e)=>{
+    if(e.key==="Escape"){
+      Object.values(overlays).forEach(ov=>{ if(ov && ov.classList.contains("open")) close(ov); });
+    }
+  });
+})();
+
 /* ============ Tier 3: the council simulation ============ */
 (function(){
   const N = 9;
