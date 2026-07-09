@@ -482,6 +482,20 @@
   }
   .audio-toggle:hover + .audio-note{opacity:1}
 
+  /* ---------- per-chapter narration button ---------- */
+  .ch-narrate{
+    display:inline-flex;align-items:center;gap:0.55em;
+    margin-inline-start:0.9em;
+    font-family:"IBM Plex Mono",monospace;font-size:0.68rem;letter-spacing:0.08em;
+    color:var(--muted);background:transparent;border:1px solid var(--rule);
+    border-radius:999px;padding:0.35em 0.9em;cursor:pointer;
+    vertical-align:middle;transition:all .25s;direction:ltr;
+  }
+  .ch-narrate:hover{border-color:var(--amber-soft);color:var(--amber)}
+  .ch-narrate[data-state="playing"]{color:var(--amber);border-color:var(--amber-soft)}
+  .ch-narrate[data-state="loading"]{opacity:0.6;cursor:wait}
+  .ch-narrate .icon{font-size:0.85em}
+
   @keyframes fade{to{opacity:1}}
   @keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
   @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.9}}
@@ -554,6 +568,7 @@
 
 <button class="audio-toggle" id="audioBtn" aria-pressed="false" aria-label="تشغيل الأجواء الصوتية" title="الأجواء الصوتية">♪</button>
 <div class="audio-note">الأجواء الصوتية — تُضاف لاحقاً. السرد المسموع قادم.</div>
+<audio id="narrator" preload="none"></audio>
 
 <!-- ============ HERO ============ -->
 <header class="hero">
@@ -578,7 +593,7 @@
   </section>
 
   <!-- 1 -->
-  <section class="chapter">
+  <section class="chapter" data-audio-src="audios/Al-buna-Resallah-Chapter 1.mp3">
     <div class="ch-num reveal">I</div>
     <h2 class="reveal">البوّابة الشرقية</h2>
     <p class="epigraph reveal">لا نرى الأحياءَ، بل أشباحَ ماضيهم.</p>
@@ -1377,6 +1392,68 @@
     entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target);} });
   },{threshold:0.12});
   els.forEach(e=>io.observe(e));
+})();
+
+/* ============ per-chapter narration ============ */
+(function(){
+  const narrator = document.getElementById("narrator");
+  if(!narrator) return;
+
+  const chapters = document.querySelectorAll("[data-audio-src]");
+  let activeBtn = null;
+
+  function setState(btn, state){
+    btn.dataset.state = state;
+    const icon = btn.querySelector(".icon");
+    const label = btn.querySelector(".label");
+    if(state === "playing"){ icon.textContent = "❚❚"; label.textContent = "إيقاف"; }
+    else if(state === "loading"){ icon.textContent = "…"; label.textContent = "تحميل"; }
+    else { icon.textContent = "▶"; label.textContent = "استمع"; }
+  }
+
+  chapters.forEach(section=>{
+    const h2 = section.querySelector("h2");
+    if(!h2) return;
+    const src = section.dataset.audioSrc;
+
+    const btn = document.createElement("button");
+    btn.className = "ch-narrate reveal in";
+    btn.type = "button";
+    btn.setAttribute("aria-label","استمع لهذا الفصل");
+    btn.innerHTML = '<span class="icon">▶</span><span class="label">استمع</span>';
+    setState(btn, "idle");
+    h2.insertAdjacentElement("afterend", btn);
+
+    btn.addEventListener("click",()=>{
+      const isThisPlaying = activeBtn === btn && !narrator.paused;
+      if(isThisPlaying){
+        narrator.pause();
+        return;
+      }
+      if(activeBtn && activeBtn !== btn) setState(activeBtn, "idle");
+      if(narrator.src && narrator.src.endsWith(encodeURI(src)) && activeBtn === btn){
+        narrator.play();
+        return;
+      }
+      activeBtn = btn;
+      setState(btn, "loading");
+      narrator.src = src;
+      narrator.play().catch(()=>{ setState(btn,"idle"); });
+    });
+  });
+
+  narrator.addEventListener("playing",()=>{ if(activeBtn) setState(activeBtn,"playing"); });
+  narrator.addEventListener("pause",()=>{ if(activeBtn) setState(activeBtn,"idle"); });
+  narrator.addEventListener("ended",()=>{ if(activeBtn) setState(activeBtn,"idle"); });
+  narrator.addEventListener("error",()=>{ if(activeBtn){ activeBtn.disabled = true; activeBtn.title = "التسجيل غير متوفر بعد"; setState(activeBtn,"idle"); } });
+
+  // stop narration when the reader switches profile voice
+  document.querySelectorAll("#switcher [data-switch]").forEach(b=>{
+    b.addEventListener("click",()=>{
+      narrator.pause();
+      if(activeBtn){ setState(activeBtn,"idle"); activeBtn = null; }
+    });
+  });
 })();
 
 /* ============ Tier 4 hook: ambient audio toggle (stubbed) ============ */
