@@ -1401,6 +1401,7 @@
   if(!narrator || !audioBtn) return;
 
   let activeBtn = null;
+  let activeSection = null;
 
   function setItemState(btn, state){
     btn.dataset.state = state;
@@ -1423,9 +1424,20 @@
   function loadAndPlay(section, btn){
     if(activeBtn && activeBtn !== btn) setItemState(activeBtn, "idle");
     activeBtn = btn;
+    activeSection = section;
     setItemState(btn, "loading");
     narrator.src = section.dataset.audioSrc;
     narrator.play().catch(()=>{ setItemState(btn, "idle"); });
+  }
+
+  function playNext(){
+    if(!activeSection) return;
+    const items = visibleItems();
+    const idx = items.indexOf(activeSection);
+    if(idx === -1 || idx === items.length - 1) return; // not found, or was the last item
+    const next = items[idx + 1];
+    const nextBtn = next.querySelector(".ch-narrate");
+    if(nextBtn) loadAndPlay(next, nextBtn);
   }
 
   // wire an inline listen button onto every narrated section (chapters + preface)
@@ -1461,7 +1473,11 @@
 
   narrator.addEventListener("playing",()=>{ if(activeBtn) setItemState(activeBtn,"playing"); setCornerState(true); });
   narrator.addEventListener("pause",()=>{ if(activeBtn) setItemState(activeBtn,"idle"); setCornerState(false); });
-  narrator.addEventListener("ended",()=>{ if(activeBtn) setItemState(activeBtn,"idle"); setCornerState(false); });
+  narrator.addEventListener("ended",()=>{
+    if(activeBtn) setItemState(activeBtn,"idle");
+    setCornerState(false);
+    playNext();
+  });
   narrator.addEventListener("error",()=>{
     if(activeBtn){ activeBtn.disabled = true; activeBtn.title = "التسجيل غير متوفر بعد"; setItemState(activeBtn,"idle"); }
     setCornerState(false);
@@ -1474,6 +1490,7 @@
       narrator.removeAttribute("src");
       if(activeBtn) setItemState(activeBtn,"idle");
       activeBtn = null;
+      activeSection = null;
       setCornerState(false);
     });
   });
