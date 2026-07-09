@@ -566,8 +566,8 @@
   <button data-switch="believer">المُؤمِن</button>
 </div>
 
-<button class="audio-toggle" id="audioBtn" aria-pressed="false" aria-label="تشغيل الأجواء الصوتية" title="الأجواء الصوتية">♪</button>
-<div class="audio-note">الأجواء الصوتية — تُضاف لاحقاً. السرد المسموع قادم.</div>
+<button class="audio-toggle" id="audioBtn" aria-pressed="false" aria-label="تشغيل السرد المسموع" title="السرد المسموع">♪</button>
+<div class="audio-note">السردُ المسموع — استمعْ إلى الحكاية بصوتها.</div>
 <audio id="narrator" preload="none"></audio>
 
 <!-- ============ HERO ============ -->
@@ -586,7 +586,7 @@
   <div class="variant" data-variant="mystic">
 
   <!-- found-ledger preface -->
-  <section class="preface">
+  <section class="preface" data-audio-src="audios/intro - approved.wav">
     <div class="frame reveal">وُجِدَ هذا الدفترُ في برجِ الحراسةِ الشرقي، بعد أن خلا المكانُ بزمنٍ طويل. لا تاريخَ على صفحاته — يبدو أنَّ صاحبَه كان يرتابُ في التواريخِ أيضاً. نَقَلْناه كما هو، بخطِّه، دون أن نُصلِحَ شكَّه أو نُكمِلَ ما تركَه ناقصاً. وهذا أوّلُ ما كُتِب.</div>
     <p class="body reveal">كان حارساً، ثمَّ صار كاتباً. وبين الأمرين طريقٌ طويل، وحربٌ، وصديقٌ على بوّابة. لم يكتبْ لِيُقرَأ، على ما يبدو؛ كتبَ لأنَّ الكتابةَ هي الشيءُ الوحيدُ الذي يبقى ثابتاً حين لا يثبتُ شيءٌ آخر — لا الرسائلُ، ولا الرجالُ، ولا اليقينُ نفسُه.</p>
     <p class="handoff reveal">نتركُه الآن يتكلّم.</p>
@@ -1394,15 +1394,15 @@
   els.forEach(e=>io.observe(e));
 })();
 
-/* ============ per-chapter narration ============ */
+/* ============ narration: intro + per-chapter, unified with corner toggle ============ */
 (function(){
   const narrator = document.getElementById("narrator");
-  if(!narrator) return;
+  const audioBtn = document.getElementById("audioBtn");
+  if(!narrator || !audioBtn) return;
 
-  const chapters = document.querySelectorAll("[data-audio-src]");
   let activeBtn = null;
 
-  function setState(btn, state){
+  function setItemState(btn, state){
     btn.dataset.state = state;
     const icon = btn.querySelector(".icon");
     const label = btn.querySelector(".label");
@@ -1411,62 +1411,71 @@
     else { icon.textContent = "▶"; label.textContent = "استمع"; }
   }
 
-  chapters.forEach(section=>{
-    const h2 = section.querySelector("h2");
-    if(!h2) return;
-    const src = section.dataset.audioSrc;
+  function setCornerState(playing){
+    audioBtn.setAttribute("aria-pressed", playing ? "true" : "false");
+    audioBtn.textContent = playing ? "♫" : "♪";
+  }
+
+  function visibleItems(){
+    return Array.from(document.querySelectorAll(".variant:not([hidden]) [data-audio-src]"));
+  }
+
+  function loadAndPlay(section, btn){
+    if(activeBtn && activeBtn !== btn) setItemState(activeBtn, "idle");
+    activeBtn = btn;
+    setItemState(btn, "loading");
+    narrator.src = section.dataset.audioSrc;
+    narrator.play().catch(()=>{ setItemState(btn, "idle"); });
+  }
+
+  // wire an inline listen button onto every narrated section (chapters + preface)
+  document.querySelectorAll("[data-audio-src]").forEach(section=>{
+    const anchor = section.querySelector("h2") || section.querySelector(".frame") || section.firstElementChild;
+    if(!anchor) return;
 
     const btn = document.createElement("button");
     btn.className = "ch-narrate reveal in";
     btn.type = "button";
-    btn.setAttribute("aria-label","استمع لهذا الفصل");
+    btn.setAttribute("aria-label","استمع لهذا الجزء");
     btn.innerHTML = '<span class="icon">▶</span><span class="label">استمع</span>';
-    setState(btn, "idle");
-    h2.insertAdjacentElement("afterend", btn);
+    setItemState(btn, "idle");
+    anchor.insertAdjacentElement("afterend", btn);
 
     btn.addEventListener("click",()=>{
-      const isThisPlaying = activeBtn === btn && !narrator.paused;
-      if(isThisPlaying){
-        narrator.pause();
-        return;
-      }
-      if(activeBtn && activeBtn !== btn) setState(activeBtn, "idle");
-      if(narrator.src && narrator.src.endsWith(encodeURI(src)) && activeBtn === btn){
-        narrator.play();
-        return;
-      }
-      activeBtn = btn;
-      setState(btn, "loading");
-      narrator.src = src;
-      narrator.play().catch(()=>{ setState(btn,"idle"); });
+      if(activeBtn === btn && !narrator.paused){ narrator.pause(); return; }
+      if(activeBtn === btn && narrator.src){ narrator.play().catch(()=>{}); return; }
+      loadAndPlay(section, btn);
     });
   });
 
-  narrator.addEventListener("playing",()=>{ if(activeBtn) setState(activeBtn,"playing"); });
-  narrator.addEventListener("pause",()=>{ if(activeBtn) setState(activeBtn,"idle"); });
-  narrator.addEventListener("ended",()=>{ if(activeBtn) setState(activeBtn,"idle"); });
-  narrator.addEventListener("error",()=>{ if(activeBtn){ activeBtn.disabled = true; activeBtn.title = "التسجيل غير متوفر بعد"; setState(activeBtn,"idle"); } });
+  // corner toggle: resumes whatever's active, or starts the story from the top the first time
+  audioBtn.addEventListener("click",()=>{
+    if(activeBtn && !narrator.paused){ narrator.pause(); return; }
+    if(activeBtn && narrator.src){ narrator.play().catch(()=>{}); return; }
+    const items = visibleItems();
+    if(!items.length) return;
+    const first = items[0];
+    const firstBtn = first.querySelector(".ch-narrate");
+    if(firstBtn) loadAndPlay(first, firstBtn);
+  });
+
+  narrator.addEventListener("playing",()=>{ if(activeBtn) setItemState(activeBtn,"playing"); setCornerState(true); });
+  narrator.addEventListener("pause",()=>{ if(activeBtn) setItemState(activeBtn,"idle"); setCornerState(false); });
+  narrator.addEventListener("ended",()=>{ if(activeBtn) setItemState(activeBtn,"idle"); setCornerState(false); });
+  narrator.addEventListener("error",()=>{
+    if(activeBtn){ activeBtn.disabled = true; activeBtn.title = "التسجيل غير متوفر بعد"; setItemState(activeBtn,"idle"); }
+    setCornerState(false);
+  });
 
   // stop narration when the reader switches profile voice
   document.querySelectorAll("#switcher [data-switch]").forEach(b=>{
     b.addEventListener("click",()=>{
       narrator.pause();
-      if(activeBtn){ setState(activeBtn,"idle"); activeBtn = null; }
+      narrator.removeAttribute("src");
+      if(activeBtn) setItemState(activeBtn,"idle");
+      activeBtn = null;
+      setCornerState(false);
     });
-  });
-})();
-
-/* ============ Tier 4 hook: ambient audio toggle (stubbed) ============ */
-(function(){
-  const btn = document.getElementById("audioBtn");
-  let on = false;
-  // Placeholder: when narration/ambient assets are added, wire an <audio> here.
-  // e.g. const amb = new Audio('ambient.mp3'); amb.loop = true;
-  btn.addEventListener("click",()=>{
-    on = !on;
-    btn.setAttribute("aria-pressed", on ? "true":"false");
-    btn.textContent = on ? "♫" : "♪";
-    // if(on){ amb.play(); } else { amb.pause(); }
   });
 })();
 </script>
