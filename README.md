@@ -15,8 +15,6 @@ An Arabic literary parable about knowing what you can't confirm — three narrat
 >
 > اسمي لا يُهِمّ. في هذا المعسكر يُنادونني بِـ«الشاكّ»... وأنا قد أجريتُ حسابَ الثقةِ مِراراً، فوجدتُه لا ينغلقُ أبداً. فأنا أعلمُ الأمر، وأريدُ أن أتأكَّدَ أنَّ صاحبي يعلمُه أيضاً، فأنتظرُ منه إشارة. وحين تصلُني الإشارةُ، أحتاجُ أن يعلمَ هو أنَّها وصلتْني... وهكذا، بلا نهاية.
 
-*Found notebook, no dates — the guard doesn't trust dates either. Full text: [`الرسالة-التي-لا-تصل.md`](./الرسالة-التي-لا-تصل.md).*
-
 </details>
 
 ## The problem
